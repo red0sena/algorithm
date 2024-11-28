@@ -8,7 +8,7 @@ input_list = list(map(int, sys.stdin.readline().rstrip().split(" ")))
 dp = [-1] * n
 
 
-def recursive(index, previous, depth):
+def recursive(index, previous):
     if index >= n:
         return 0
 
@@ -25,7 +25,7 @@ def recursive(index, previous, depth):
     value_list = []
 
     for i in range(index+1, n):
-        next_value = recursive(i, input_list[index], depth+1)
+        next_value = recursive(i, input_list[index])
         value_list.append(next_value)
 
     value_list.append(max_value)
@@ -35,6 +35,6 @@ def recursive(index, previous, depth):
     return dp[index]
 
 for i in range(n):
-    recursive(i, 0, 0)
-    
+    recursive(i, 0)
+
 print(max(dp))
