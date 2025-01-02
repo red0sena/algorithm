@@ -10,8 +10,8 @@ def solution(land):
     def count_oil(start_x, start_y):
         global global_oil_count
         queue = deque([(start_x, start_y)])
-        # visited = [[-1] * len(land[0]) for _ in range(len(land))]
-        oil_map[start_x][start_y] = 1
+        visited = [[-1] * len(land[0]) for _ in range(len(land))]
+        visited[start_x][start_y] = 1
         visited_list = [(start_x, start_y)]
         count = 0
         while queue:
@@ -21,8 +21,8 @@ def solution(land):
                 nx = x + dx[i]
                 ny = y + dy[i]
                 if 0 <= nx < len(land) and 0 <= ny < len(land[0]) and (land[nx][ny] == 1):
-                    if oil_map[nx][ny] != 1:
-                        oil_map[nx][ny] = 1
+                    if visited[nx][ny] != 1:
+                        visited[nx][ny] = 1
                         queue.append((nx, ny))
                         visited_list.append((nx, ny))
         global_oil_count += 1
@@ -67,6 +67,3 @@ def solution(land):
     return res
 
 
-print(
-    solution([[1, 0, 1, 0, 1, 1], [1, 0, 1, 0, 0, 0], [1, 0, 1, 0, 0, 1], [1, 0, 0, 1, 0, 0], [1, 0, 0, 1, 0, 1], [1, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1]])
-)
