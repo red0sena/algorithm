@@ -1,28 +1,24 @@
-from collections import deque
-import sys
+n, m = map(int, input().split(' '))
+s = []
+visited = [False] * (n + 1) # 번호가 1번부터니까 그거 index그대로 사용하려고 1더함
 
-n, m = map(int, sys.stdin.readline().split())
 
-de = deque([])
 
-def dfs(depth):
-    if depth > m:
-        print(' '.join(str(num) for num in de))
-        de.pop()
-        depth -= 1
+def dfs():
+    if len(s) == m:
+        print(' '.join(map(str, s)))
         return
     for i in range(1, n+1):
-        if de:
-           if i < de[-1]:
-               continue
-        if i in de:
+        if visited[i]:
             continue
-        de.append(i)
-        dfs(depth+1)
+        if len(s) >= 1:
+            if s[-1] >= i:
+                continue
+        s.append(i)
+        visited[i] = True
+        dfs()
+        s.pop()
+        visited[i] = False
 
-    if de:
-        de.pop()
 
-
-
-dfs(1)
+dfs()
