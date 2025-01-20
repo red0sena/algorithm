@@ -1,25 +1,25 @@
 from collections import deque
-
 def solution(m, n, puddles):
-    data = [[1] * m for _ in range(n)]
-    path = [[0] * m for _ in range(n)]
-    path[0][0] = 1
-    for p in puddles:
-        data[p[1]-1][p[0]-1] = 0
+    map_list = [[1] * m for _ in range(n)]
+    visited = [[0] * m for _ in range(n)]
+    visited[0][0] = 1
+    for puddle in puddles:
+        map_list[puddle[1] - 1][puddle[0] - 1] = 0
+    move = [(1, 0), (-1, 0), (0, 1), (0, -1)]
 
-    q = deque()
-    q.append((0,0))
-    dxdy = (1, 0), (-1, 0), (0, 1), (0, -1)
+    q = deque([(0,0)])
+
     while q:
-        y, x = q.popleft()
-        for dy, dx in dxdy:
-            if x+dx<0 or x+dx>=m or y+dy<0 or y+dy>=n:
-                continue
-            if data[y+dy][x+dx] == 1:
-                data[y+dy][x+dx] += data[y][x]
-                q.append((y+dy, x+dx))
-        path[y][x] += path[y-1][x]
-        path[y][x] += path[y][x-1]
-        path[y][x] %= 1000000007
+        x, y = q.popleft()
+        for dx, dy in move:
+            nx = x + dx
+            ny = y  + dy
+            if 0 <= nx < n and 0 <= ny < m:
+                if map_list[nx][ny] == 1:
+                    map_list[nx][ny] = -1
+                    q.append((nx,ny))
+        visited[x][y] += visited[x-1][y]
+        visited[x][y] += visited[x][y-1]
+        visited[x][y] %= 1000000007
 
-    return path[-1][-1]
+    return visited[-1][-1]
