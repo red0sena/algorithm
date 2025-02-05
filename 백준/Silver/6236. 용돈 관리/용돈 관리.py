@@ -1,34 +1,29 @@
 n, m = map(int, input().split())
 
-price_list = []
+input_list = []
 
 for _ in range(n):
-    price_list.append(int(input()))
+    input_list.append(int(input()))
 
-max_price = max(price_list)
-
-low, high = max_price, ((max_price * n) // m)
-
-answer = high
-
-while low <= high:
-    mid = (low+high) // 2
-    count = 0
-    nokori_price = mid
-    for i in range(len(price_list)):
-        price = price_list[i]
-        if nokori_price - price < 0:
-            nokori_price = mid
-            nokori_price -= price
+max_price = max(input_list)
+left, right = max_price, (max_price*n)//m
+res = 0
+while left <= right:
+    mid = (left+right) // 2
+    k = mid
+    count = 1
+    for i in range(n):
+        need_money = input_list[i]
+        if need_money > k:
+            k = mid
             count += 1
-        else:
-            nokori_price -= price
-    
-    if count < m:
-        high = mid - 1
-        answer = mid
+        k -= need_money
+    if count > m:
+        left = mid + 1
 
     else:
-        low = mid + 1
+        right = mid - 1
+        res = mid
 
-print(answer)
+
+print(res)
