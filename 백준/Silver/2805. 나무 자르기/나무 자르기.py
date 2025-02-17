@@ -1,26 +1,40 @@
+from bisect import bisect_left
+
 n, m = map(int, input().split())
 
 input_list = list(map(int, input().split()))
 
+left, right = 0, 1000000000
+res = 0
+flag = True
 
-max_val = max(input_list) - 1
-min_val = 0
-res = max_val
+input_list.sort()
 
-while min_val <= max_val:
-    mid = (min_val+max_val) // 2
-    tree_m = 0
-    for tree in input_list:
-        if tree >= mid:
-            tree_m += (tree - mid)
 
-    if tree_m >= m:
-        min_val = mid + 1
+prefix = [0]
+
+for i in range(n):
+    prefix.append(prefix[i] + input_list[i])
+
+
+while left <= right:
+    mid = (left+right) // 2
+    mid_idx = bisect_left(input_list, mid)
+
+    tree_len_sum = (prefix[-1] - prefix[mid_idx]) - mid * (n-mid_idx)
+
+
+    if tree_len_sum == m:
+        print(mid)
+        flag = False
+        break
+    elif tree_len_sum > m:
+        left = mid + 1
         res = mid
     else:
-        max_val = mid - 1
+        right = mid - 1
 
 
-print(res)
 
-
+if flag:
+    print(res)
