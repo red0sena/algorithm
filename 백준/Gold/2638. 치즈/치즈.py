@@ -1,58 +1,57 @@
 from collections import deque
-n, m = map(int, input().split())
 
-input_list = [list(map(int, input().split())) for _ in range(n)]
+def bfs(N, M, grid):
+    # 상하좌우 이동을 위한 방향 벡터
+    dx = [-1, 1, 0, 0]
+    dy = [0, 0, -1, 1]
+    
+    # 외부 공기 표시 (-1), 치즈(1), 내부 공기(0)
+    def mark_air():
+        visited = [[False] * M for _ in range(N)]
+        q = deque([(0, 0)])  # 가장자리에서 시작 (외부 공기)
+        grid[0][0] = -1
+        visited[0][0] = True
+        
+        while q:
+            x, y = q.popleft()
+            for i in range(4):
+                nx, ny = x + dx[i], y + dy[i]
+                if 0 <= nx < N and 0 <= ny < M and not visited[nx][ny] and grid[nx][ny] != 1:
+                    grid[nx][ny] = -1  # 외부 공기로 표시
+                    visited[nx][ny] = True
+                    q.append((nx, ny))
+    
+    time = 0
+    while True:
+        # 1. 외부 공기 영역 표시
+        mark_air()
+        
+        # 2. 녹을 치즈 찾기
+        melting = []
+        for i in range(N):
+            for j in range(M):
+                if grid[i][j] == 1:
+                    air_count = 0
+                    for k in range(4):
+                        ni, nj = i + dx[k], j + dy[k]
+                        if grid[ni][nj] == -1:  # 외부 공기와 접촉
+                            air_count += 1
+                    if air_count >= 2:  # 2변 이상 공기와 접촉
+                        melting.append((i, j))
+        
+        # 3. 치즈가 더 이상 녹지 않으면 종료
+        if not melting:
+            return time
+        
+        # 4. 치즈 녹이기
+        for x, y in melting:
+            grid[x][y] = 0  # 치즈 제거
+        
+        time += 1
 
-q = deque()
+# 입력 처리
+N, M = map(int, input().split())
+grid = [list(map(int, input().split())) for _ in range(N)]
 
-for i in range(n):
-    for j in range(m):
-        if input_list[i][j] == 1:
-            q.append((i, j))
-
-move = [(0,1),(1,0),(0,-1),(-1,0)]
-melt_cheez = []
-not_melt_cheez = []
-res = 0
-
-def bfs(x, y):
-    visited = [[-1] * m for _ in range(n)]
-    q = deque([(x, y)])
-    while q:
-        x, y = q.pop()
-        for dx, dy in move:
-            nx = dx + x
-            ny = dy + y
-            if 0 <= nx < n and 0 <= ny < m:
-                if input_list[nx][ny] == 0 and visited[nx][ny] == -1:
-                    visited[nx][ny] = 1
-                    q.append((nx,ny))
-            else:
-                return 1
-    return 0
-
-while True:
-    if not q:
-        break
-    x, y = q.popleft()
-    count = 0
-    for dx, dy in move:
-        nx = dx + x
-        ny = dy + y
-        if input_list[nx][ny] == 0:
-            count += bfs(nx,ny)
-            if count >= 2:
-                melt_cheez.append((x,y))
-                break
-    if count < 2:
-        not_melt_cheez.append((x,y))
-    if not q and melt_cheez:
-        for mx, my in melt_cheez:
-            input_list[mx][my] = 0
-        res += 1
-        q.extend(not_melt_cheez)
-        not_melt_cheez = []
-        melt_cheez = []
-
-print(res)
-
+# 결과 출력
+print(bfs(N, M, grid))
