@@ -19,7 +19,7 @@ def bfs(x, y):
     visited = [[-1] * m for _ in range(n)]
     q = deque([(x, y)])
     while q:
-        x, y = q.popleft()
+        x, y = q.pop()
         for dx, dy in move:
             nx = dx + x
             ny = dy + y
@@ -41,14 +41,11 @@ while True:
         ny = dy + y
         if input_list[nx][ny] == 0:
             count += bfs(nx,ny)
-
-
-    if count >= 2:
-        melt_cheez.append((x,y))
-    else:
+            if count >= 2:
+                melt_cheez.append((x,y))
+                break
+    if count < 2:
         not_melt_cheez.append((x,y))
-
-
     if not q and melt_cheez:
         for mx, my in melt_cheez:
             input_list[mx][my] = 0
