@@ -9,8 +9,3 @@ def solution(n, money):
             dp[amount] += dp[amount - coin]
     
     return dp[n]
-
-# 테스트 예시
-n = 5
-money = [1, 2, 5]
-print(solution(n, money))  # 출력: 4
