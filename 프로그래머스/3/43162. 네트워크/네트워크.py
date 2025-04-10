@@ -1,24 +1,22 @@
-count = 0
+
 def solution(n, computers):
-    visited = [-1] * n
-
-    def dfs(depth):
-        global count
-        for j in range(n):
-            if depth == j:
-                continue
-            if computers[depth][j] == 1 and visited[j] == -1:
-                visited[j]= 1
-                count += 1
-                dfs(j)
+    visited = [False] * n
 
 
+    def dfs(node):
+        network = computers[node]
+        for i in range(n):
+            if network[i] == 1:
+                if not visited[i]:
+                    visited[i] = True
+                    dfs(i)
+
+    count = 0
     for i in range(n):
-        visited[i] = 1
-        dfs(i)
+        if not visited[i]:
+            count += 1
+            visited[i] = True
+            dfs(i)
 
-    if n-count <= 0:
-        return 1
-    else:
-        return n-count
 
+    return count
