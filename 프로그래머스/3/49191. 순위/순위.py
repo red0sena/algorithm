@@ -1,30 +1,36 @@
+from collections import deque
+
 def solution(n, results):
-    # win[i][j] = True 이면 i가 j를 이긴다는 의미
-    win = [[False] * (n+1) for _ in range(n+1)]
-    
-    # 직접 경기 결과 기록
+    # 정방향 그래프: graph[a] = [b1, b2, …]  (a가 이긴 선수들)
+    # 역방향 그래프: rgraph[b] = [a1, a2, …] (b에게 진 선수들)
+    graph = [[] for _ in range(n+1)]
+    rgraph = [[] for _ in range(n+1)]
     for a, b in results:
-        win[a][b] = True
-
-    # Floyd–Warshall: i->k, k->j 관계가 모두 True면 i->j도 True
-    for k in range(1, n+1):
-        for i in range(1, n+1):
-            if win[i][k]:
-                for j in range(1, n+1):
-                    if win[k][j]:
-                        win[i][j] = True
-
+        graph[a].append(b)
+        rgraph[b].append(a)
+    
+    def bfs(start, adj):
+        """start에서 출발해 adj 그래프를 따라 도달할 수 있는 모든 노드 수 리턴."""
+        visited = [False] * (n+1)
+        q = deque([start])
+        visited[start] = True
+        cnt = 0
+        while q:
+            u = q.popleft()
+            for v in adj[u]:
+                if not visited[v]:
+                    visited[v] = True
+                    cnt += 1
+                    q.append(v)
+        return cnt
+    
     answer = 0
-    # 각 선수 i에 대해,
-    # 나머지 n-1명 모두와의 승패 관계를 알 수 있으면 랭킹이 결정된 것
     for i in range(1, n+1):
-        known = 0
-        for j in range(1, n+1):
-            if i == j:
-                continue
-            if win[i][j] or win[j][i]:
-                known += 1
-        if known == n - 1:
+        # i가 이길 수 있는 선수 수 + i에게 이긴 선수 수
+        win_cnt = bfs(i, graph)
+        lose_cnt = bfs(i, rgraph)
+        # 둘을 합쳐 나머지 선수 전원(n-1명)을 모두 알 수 있으면 순위 결정 가능
+        if win_cnt + lose_cnt == n - 1:
             answer += 1
 
     return answer
