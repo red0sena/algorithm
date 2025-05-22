@@ -1,16 +1,17 @@
 from collections import deque
+import sys
+input = sys.stdin.readline
 
 def is_bipartite(v, graph, color, start):
-    q = deque([(start, 1)])  # (정점, 색상)
-    color[start] = 1  # 시작 정점에 색 1 부여
+    q = deque([start])
+    color[start] = 1  # 시작 정점 색 1
     while q:
-        u, now_color = q.popleft()
+        u = q.popleft()
         for v in graph[u]:
-            if color[v] == 0:  # 방문하지 않은 정점
-                next_color = -now_color  # 반대 색상 부여
-                color[v] = next_color
-                q.append((v, next_color))
-            elif color[v] == now_color:  # 인접 정점과 색이 같으면 이분 그래프 아님
+            if color[v] == 0:  # 미방문 정점
+                color[v] = -color[u]  # 반대 색 부여
+                q.append(v)
+            elif color[v] == color[u]:  # 색 충돌
                 return False
     return True
 
@@ -18,7 +19,7 @@ k = int(input())
 for _ in range(k):
     v, e = map(int, input().split())
     graph = [[] for _ in range(v + 1)]
-    color = [0] * (v + 1)  # 0: 미방문, 1: 색1, -1: 색2
+    color = [0] * (v + 1)
     
     # 간선 입력
     for _ in range(e):
@@ -26,12 +27,12 @@ for _ in range(k):
         graph[a].append(b)
         graph[b].append(a)
     
-    # 모든 정점에 대해 BFS 수행
-    is_bipartite_graph = True
+    # 모든 정점에 대해 BFS
+    result = True
     for i in range(1, v + 1):
-        if color[i] == 0:  # 아직 방문하지 않은 정점에서 BFS 시작
+        if color[i] == 0:  # 미방문 정점에서 BFS 시작
             if not is_bipartite(v, graph, color, i):
-                is_bipartite_graph = False
+                result = False
                 break
     
-    print("YES" if is_bipartite_graph else "NO")
+    print("YES" if result else "NO")
