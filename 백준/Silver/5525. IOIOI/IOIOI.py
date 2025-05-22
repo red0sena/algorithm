@@ -1,34 +1,28 @@
 import sys
 input = sys.stdin.readline
 
-# 입력
-N = int(input())
-M = int(input())
-S = input().rstrip()
+def main():
+    N = int(input())
+    M = int(input())
+    S = input().rstrip()
 
-# P_N 패턴: IOI...OI (길이 2N+1)
-# S에서 P_N이 나타나는 횟수 세기
-count = 0
-i = 0
-while i <= M - (2 * N + 1):
-    # P_N은 'I'로 시작하고, 'I'와 'O'가 교대로 나타남
-    if S[i] == 'I':
-        valid = True
-        for j in range(2 * N + 1):
-            if j % 2 == 0:  # 짝수 인덱스는 'I'
-                if S[i + j] != 'I':
-                    valid = False
-                    break
-            else:  # 홀수 인덱스는 'O'
-                if S[i + j] != 'O':
-                    valid = False
-                    break
-        if valid:
-            count += 1
-            i += 1  # 다음 위치로 이동
+    cnt = 0   # 현재 연속된 "IOI" 패턴 수
+    ans = 0   # 찾은 P_N 패턴 수
+    i = 0
+    # i+2 < M 조건으로 S[i:i+3] 접근이 항상 유효하도록 함
+    while i + 2 < M:
+        # "I","O","I" 연속 등장 확인
+        if S[i] == 'I' and S[i+1] == 'O' and S[i+2] == 'I':
+            cnt += 1
+            # 현재 연속된 "IOI"가 N개 이상이면 P_N 패턴 하나 발견
+            if cnt >= N:
+                ans += 1
+            i += 2  # 중첩 허용하며 다음 검사 위치로 점프
         else:
-            i += 1  # 패턴이 맞지 않으면 다음 위치로
-    else:
-        i += 1  # 'I'로 시작하지 않으면 스킵
+            cnt = 0
+            i += 1
 
-print(count)
+    print(ans)
+
+if __name__ == "__main__":
+    main()
