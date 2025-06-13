@@ -1,26 +1,21 @@
+from collections import defaultdict
+import heapq
 
 
-def solution(tickets):  
-    n = len(tickets)
-    visited = [-1] * n
+def solution(tickets):
+    # 인접 리스트 생성: 각 공항에서 출발하는 도착지를 사전순으로 저장
+    graph = defaultdict(list)
+    for src, dst in sorted(tickets):  # 사전순으로 정렬
+        graph[src].append(dst)
 
+    # DFS를 이용한 Hierholzer 알고리즘
+    result = []
+    def dfs(airport):
+        # 현재 공항에서 갈 수 있는 도착지를 사전순으로 탐색
+        while graph[airport]:
+            next_airport = graph[airport].pop(0)  # 사전순으로 첫 번째 도착지 선택
+            dfs(next_airport)
+        result.append(airport)  # 더 이상 갈 곳이 없으면 결과에 추가
 
-    sort_list = []
-
-    def dfs(ticket, list_res):
-        if n+1 == len(list_res):
-            sort_list.append([*list_res])
-            return
-        for i in range(n):
-            if tickets[i][0] == ticket and visited[i] == -1:
-                visited[i] = 1
-                list_res.append(tickets[i][1])
-                dfs(tickets[i][1], list_res)
-                list_res.pop()
-                visited[i] = -1
-
-
-
-    dfs("ICN", ["ICN"])
-    sort_list.sort()
-    return sort_list[0]
+    dfs("ICN")  # JFK에서 시작
+    return result[::-1]  # 결과 역순으로 반환
