@@ -1,69 +1,52 @@
 from collections import deque
-global_oil_count = 0
 
 def solution(land):
-    oil_map = [[-1] * len(land[0]) for _ in range(len(land))]
+    n, m = len(land), len(land[0])
+    visited = [[0] * m for _ in range(n)]
+    oil_dict = {} # {석유덩어리ID: 석유량}
+    oil_id = 1    # 석유 덩어리에 부여할 고유 번호 (1부터 시작)
+    
     dx = [-1, 1, 0, 0]
     dy = [0, 0, -1, 1]
+    
+    # 1. BFS를 통해 석유 덩어리(Cluster) 탐색 및 ID 부여
+    for i in range(n):
+        for j in range(m):
+            # 석유가 있고, 아직 방문하지 않은 덩어리라면 BFS 시작
+            if land[i][j] == 1 and visited[i][j] == 0:
+                q = deque([(i, j)])
+                visited[i][j] = oil_id
+                count = 1
+                
+                while q:
+                    x, y = q.popleft()
+                    for k in range(4):
+                        nx, ny = x + dx[k], y + dy[k]
+                        if 0 <= nx < n and 0 <= ny < m:
+                            if land[nx][ny] == 1 and visited[nx][ny] == 0:
+                                visited[nx][ny] = oil_id # 방문 처리 시 ID 기록
+                                q.append((nx, ny))
+                                count += 1
+                
+                # 해당 ID의 석유량 저장
+                oil_dict[oil_id] = count
+                oil_id += 1
 
-
-    def count_oil(start_x, start_y):
-        global global_oil_count
-        queue = deque([(start_x, start_y)])
-        visited = [[-1] * len(land[0]) for _ in range(len(land))]
-        visited[start_x][start_y] = 1
-        visited_list = [(start_x, start_y)]
-        count = 0
-        while queue:
-            count += 1
-            x, y = queue.popleft()
-            for i in range(4):
-                nx = x + dx[i]
-                ny = y + dy[i]
-                if 0 <= nx < len(land) and 0 <= ny < len(land[0]) and (land[nx][ny] == 1):
-                    if visited[nx][ny] != 1:
-                        visited[nx][ny] = 1
-                        queue.append((nx, ny))
-                        visited_list.append((nx, ny))
-        global_oil_count += 1
-        for x, y in visited_list:
-            oil_map[x][y] = (global_oil_count, count)
-
-        return count, global_oil_count
-
-    res = -1
-    # 석유가 있나 열별로 찾기
-    for column in range(len(land[0])):
-        # 이 열에서 석유 개수
-        oil_this_column = 0
-        # 이 열에서 이미 count한 석유
-        already_count_list = []
-        for row in range(len(land)):
-            # 만약 석유가 있는 땅이면
-            if land[row][column] == 1:
-                # 아직 이 땅의 석유 범위를 세지 않았다면
-                if oil_map[row][column] == -1:
-                    # 석유범위를 세고
-                    count_oil_return = count_oil(row, column)
-                    # 열에서 석유 숫자 넣고
-                    oil_this_column += count_oil_return[0]
-                    # 이미 셋으니까 count on
-                    already_count_list.append(count_oil_return[1])
-                else:
-                    # 이미 이땅에서 석유가 count가 되었다면 이전에 count했던 정보 가져오기
-                    oil_count = oil_map[row][column]
-                    # 이 열에서 이 범위의 석유를 이미 count했다면
-                    if oil_count[0] in already_count_list:
-                        # pass
-                        pass
-                    # 이 열에서 석유 범위를 count 안했다면
-                    else:
-                        # 석유 count 그리고 count 목록에 추가
-                        oil_this_column += oil_count[1]
-                        already_count_list.append(oil_count[0])
-        # 열 중에서 최대값 찾기
-        res = max(oil_this_column, res)
-
-    return res
-
-
+    # 2. 각 열(Column)을 지나가며 채굴 가능한 석유량 계산
+    max_oil = 0
+    
+    for j in range(m):
+        current_oil = 0
+        seen_ids = set() # 현재 열에서 이미 더한 덩어리인지 확인용
+        
+        for i in range(n):
+            if land[i][j] == 1:
+                chunk_id = visited[i][j] # 해당 위치의 석유 ID 가져오기
+                if chunk_id not in seen_ids:
+                    current_oil += oil_dict[chunk_id]
+                    seen_ids.add(chunk_id)
+        
+        if current_oil > max_oil:
+            max_oil = current_oil
+            
+    return max_oil
